@@ -17,9 +17,9 @@ from . import utils
 @click.option('--local-path', help='Path to extract contents of tarball',
         default='/tmp/kolla/')
 def main(base, type, release, tarball_url, local_path):
-    click.echo("{} {} {}".format(base, type, release))
+    click.echo("Downloading {} {} {}".format(base, type, release))
     tb = tarballs.TarFile(base, type, release, tarball_url, local_path)
-    #tb.download()
+    tb.download()
     tb.extract()
     tb.rename_lokolla()
 
