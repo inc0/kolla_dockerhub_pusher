@@ -1,4 +1,5 @@
 import os
+import shutil
 import tarfile
 
 import click
@@ -34,14 +35,14 @@ class TarFile(object):
                 f.write(data)
 
     def extract(self):
-        click.echo("Extracting to " + self.local_path + self.fname[:-7])
+        click.echo("Extracting to " + self.local_path + "registry")
         tar = tarfile.open(self.local_path + self.fname, "r:gz")
-        tar.extractall(path=self.local_path + self.fname[:-7], numeric_owner=True)
+        tar.extractall(path=self.local_path + "registry", numeric_owner=True)
         tar.close()
 
     def rename_lokolla(self):
-        os.chmod(self.local_path + self.fname[:-7], 0o700)
-        dirname = self.local_path + self.fname[:-7] + "/docker/registry/v2/repositories/"
-        os.rename(dirname + "lokolla", dirname + "kolla")
+        os.chmod(self.local_path + "registry", 0o700)
+        dirname = self.local_path + "registry" + "/docker/registry/v2/repositories/"
+        shutil.move(dirname + "lokolla", dirname + "kolla")
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from subprocess import call
 
 import click
 
@@ -7,7 +8,12 @@ from . import registry
 from . import utils
 
 
-@click.command()
+@click.group(help="Toolset to manage Kolla registry")
+def main():
+    pass
+
+
+@click.command(help="Downloads built registry tarball and sets it up locally")
 @click.option('--base', help='base OS')
 @click.option('--type', help='Type of installation', type=click.Choice(
     ['binary', 'source']))
@@ -16,16 +22,38 @@ from . import utils
         default="http://tarballs.openstack.org/kolla/images/")
 @click.option('--local-path', help='Path to extract contents of tarball',
         default='/tmp/kolla/')
-def main(base, type, release, tarball_url, local_path):
+def download(base, type, release, tarball_url, local_path):
     click.echo("Downloading {} {} {}".format(base, type, release))
     tb = tarballs.TarFile(base, type, release, tarball_url, local_path)
     tb.download()
     tb.extract()
     tb.rename_lokolla()
 
-    reg_dirname = utils.get_file_name(base, type, release)[:-7]
-    reg = registry.Registry(local_path, reg_dirname)
+    reg = registry.Registry(local_path)
     reg.setup()
+
+
+@click.command(help="Lists all images available in registry")
+@click.option('--local-path', help='Path to extract contents of tarball',
+        default='/tmp/kolla/')
+def ls(local_path):
+    reg = registry.Registry(local_path)
+    for img in reg.ls():
+        click.echo(img)
+
+
+@click.command(help="Pulls all images from registry")
+@click.option('--local-path', help='Path to extract contents of tarball',
+        default='/tmp/kolla/')
+def pull(local_path):
+    lreg = registry.Registry(local_path)
+    lreg.pull_all()
+
+
+
+main.add_command(download)
+main.add_command(ls)
+main.add_command(pull)
 
 if __name__ == "__main__":
     main()
