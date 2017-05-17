@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from subprocess import call
+import subprocess
 
 import click
 
@@ -50,10 +50,42 @@ def pull(local_path):
     lreg.pull_all()
 
 
+@click.command(help="Change target registry address and add new tags")
+@click.option('--release', help='OpenStack release')
+@click.option('--namespace', help='Namespace on dockerhub',
+        default='kolla')
+@click.option('--local-path', help='Path to extract contents of tarball',
+        default='/tmp/kolla/')
+def retag(release, local_path, namespace):
+    lreg = registry.Registry(local_path)
+    images = lreg.retag(release, namespace)
+
+
+@click.command(help="Push to dockerhub")
+@click.option('--release', help='OpenStack release')
+@click.option('--namespace', help='Namespace on dockerhub',
+        default='kolla')
+@click.option('--local-path', help='Path to extract contents of tarball',
+        default='/tmp/kolla/')
+def push(release, local_path, namespace):
+    lreg = registry.Registry(local_path)
+    lreg.push(release, namespace)
+
+
+@click.command(help="Push to dockerhub")
+@click.option('--release', help='OpenStack release')
+@click.option('--namespace', help='Namespace on dockerhub',
+        default='kolla')
+def clean(release, namespace):
+    subprocess.run("docker rmi -f $(docker images | grep " + release + " | grep " + namespace + " | awk '{print $3}')", shell=True)
+
 
 main.add_command(download)
 main.add_command(ls)
 main.add_command(pull)
+main.add_command(retag)
+main.add_command(push)
+main.add_command(clean)
 
 if __name__ == "__main__":
     main()
