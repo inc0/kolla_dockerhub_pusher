@@ -38,8 +38,6 @@ class TarFile(object):
                 f.write(data)
 
     def extract(self):
-        if not os.path.exists(self.local_path):
-            os.makedirs(self.local_path)
         click.echo("Extracting to " + self.local_path + "registry")
         tar = tarfile.open(self.local_path + self.fname, "r:gz")
         tar.extractall(path=self.local_path + "registry", numeric_owner=True)
