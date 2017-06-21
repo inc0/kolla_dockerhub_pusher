@@ -37,7 +37,7 @@ class TarFile(object):
     def extract(self):
         click.echo("Extracting to " + self.local_path + "registry")
         tar = tarfile.open(self.local_path + self.fname, "r:gz")
-        tar.extractall(path=self.local_path + "registry", numeric_owner=True)
+        tar.extractall(path=self.local_path + "registry")
         tar.close()
 
     def rename_lokolla(self):
