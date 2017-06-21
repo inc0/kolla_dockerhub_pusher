@@ -30,6 +30,9 @@ class TarFile(object):
         total_size = int(r.headers.get('content-length', 0));
         total_size = int(total_size / (1024 * 1024))
 
+        if not os.path.exists(self.local_path):
+            os.makedirs(self.local_path)
+
         with open(self.local_path + self.fname, 'wb') as f:
             for data in tqdm(r.iter_content(chunk_size=1024*1024), total=total_size, unit='MB'):
                 f.write(data)
@@ -37,7 +40,7 @@ class TarFile(object):
     def extract(self):
         click.echo("Extracting to " + self.local_path + "registry")
         tar = tarfile.open(self.local_path + self.fname, "r:gz")
-        tar.extractall(path=self.local_path + "registry", numeric_owner=True)
+        tar.extractall(path=self.local_path + "registry")
         tar.close()
 
     def rename_lokolla(self):
